@@ -1,4 +1,26 @@
 #include "Arduino.h"
+#include "AzureIotHub.h"
+#include "Esp32MQttClient.h"
+
+
+
+#define INTERVAL 5000
+#define DEVICE_ID "ESP32Device"
+#define MESSAGE_MAX_LEN 256
+int messageCount = 1;
+static const char* connectionString = "HostName=IOTfwttest.azure-devices.net;DeviceId=IotESP32_dev_1;SharedAccessKey=qjBu97m+ZQMC/3YPtB1IuJSQjS6IcDjRiAIoTMHh6oM=";
+const char *messageData = "{\"deviceId\":\"%s\", \"messageId\":%d, \"Voltage L1-N\":%f, \"Current L1\":%f, \"Cumulative Energy imported\":%f}";
+static bool hasWifi = false;
+static bool messageSending = true;
+static uint64_t send_interval_ms;
+
+static void SendConfirmationCallback(IOTHUB_CLIENT_CONFIRMATION_RESULT result)
+{
+  if (result == IOTHUB_CLIENT_CONFIRMATION_OK)
+  {
+    Serial.println("Send Confirmation Callback finished.");
+  }
+}
 
 extern "C"
 {
@@ -96,6 +118,7 @@ void app_main(void)
 {   
     nvs_flash_init();   
     wifi_connection();
+
    // xTaskCreate(helow,"helow", 2048, NULL, 5, NULL);
     //xTaskCreate(&blinky, "blinky", 512, NULL, 5, NULL);
 }
